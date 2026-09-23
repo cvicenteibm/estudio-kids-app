@@ -1,0 +1,25 @@
+# Dependencias
+node_modules/
+
+# Base de datos local (NO subir al repo — se genera automáticamente)
+*.sqlite
+*.sqlite3
+*.db
+
+# Variables de entorno locales (NUNCA subir al repo)
+.env
+
+# Logs
+*.log
+nohup.out
+/tmp/
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+
+# Build artifacts
+*.zip

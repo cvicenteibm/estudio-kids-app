@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>⚔️ Héroe del Overworld — Aprendo con Alegría</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#5D9E3A">
+  <!-- Estilos centralizados y pulidos -->
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     PANTALLA 0 — ELEGIR JUGADOR
+══════════════════════════════════════════════════════ -->
+<div class="screen active" id="screen-users">
+  <div class="screen-panel" style="max-width:520px; width:100%">
+    <div class="screen-title">⚔️ ¿QUIÉN ES<br>EL HÉROE?</div>
+    <p class="screen-subtitle">🗺️ El Overworld te espera, valiente aventurero.<br>Elegí tu perfil o crea uno nuevo para empezar la misión.</p>
+    <div class="users-grid" id="users-grid"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PANTALLA 1 — BIENVENIDA
+══════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-welcome">
+  <div class="screen-panel" style="max-width: 600px;">
+    <div class="screen-title" style="font-size: 1.3rem;">⚔️ REGISTRÁ TU<br>HÉROE</div>
+    <p class="screen-subtitle" style="font-size: 0.58rem; margin-bottom: 12px; line-height: 1.8;">
+      🌍 ¡Crea tu perfil para guardar tus diamantes, trofeos y progreso!
+    </p>
+    
+    <div class="form-container" style="display: flex; flex-direction: column; gap: 14px; text-align: left; width: 100%;">
+      <div>
+        <label style="font-family: 'Press Start 2P', monospace; font-size: 0.45rem; color: var(--mc-gold); display: block; margin-bottom: 6px;">✍️ Nombre del Héroe:</label>
+        <input id="player-name-input" type="text" maxlength="16" placeholder="Nombre..." style="width: 100%; box-sizing: border-box; font-family: 'Nunito', sans-serif; font-size: 1.1rem; padding: 10px; border: 4px solid #000; box-shadow: 3px 3px 0 #000; border-radius: 0; background: #fff;" oninput="validateRegisterForm()"/>
+      </div>
+      
+      <div>
+        <label style="font-family: 'Press Start 2P', monospace; font-size: 0.45rem; color: var(--mc-gold); display: block; margin-bottom: 6px;">🔑 PIN Secreto (Mín. 4 números):</label>
+        <input id="player-pin-input" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]*" placeholder="Ej: 1234" style="width: 100%; box-sizing: border-box; font-family: 'Nunito', sans-serif; font-size: 1.1rem; padding: 10px; border: 4px solid #000; box-shadow: 3px 3px 0 #000; border-radius: 0; background: #fff;" oninput="validateRegisterForm()"/>
+      </div>
+
+      <div>
+        <label style="font-family: 'Press Start 2P', monospace; font-size: 0.45rem; color: var(--mc-gold); display: block; margin-bottom: 6px;">🦊 Elegí tu Avatar:</label>
+        <div id="avatar-selector" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; background: rgba(0,0,0,0.1); padding: 10px; border: 4px solid #000;">
+          <!-- Se llenará dinámicamente con JS -->
+        </div>
+      </div>
+    </div>
+    
+    <p id="register-error" style="font-family: 'Nunito', sans-serif; font-size: 0.9rem; color: #f43f5e; margin: 10px 0 0; display: none; font-weight: bold;"></p>
+
+    <br>
+    <button class="screen-btn" id="btn-welcome-next" disabled onclick="registerNewUser()" style="width: 100%;">
+      ⚔️ ¡CREAR HÉROE Y COMENZAR!
+    </button>
+    <br><br>
+    <button class="screen-btn" style="background:#555;font-size:0.38rem;padding:8px 16px" onclick="goToScreen('screen-users')">
+      ◀ Volver a Selección de Héroe
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PANTALLA 2 — DIFICULTAD
+══════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-difficulty">
+  <div class="screen-panel">
+    <div class="screen-title">⚙️ ELIGE TU<br>DIFICULTAD</div>
+    <p class="screen-subtitle" id="diff-greeting">🗺️ Cada bioma es un nivel de dificultad. ¡Cuanto más difícil, más diamantes ganás por misión!</p>
+    <div class="diff-grid">
+      <div class="diff-card selected" id="dcard-easy"   style="background:#1a7a3a" onclick="selectDiffCard('easy')">
+        <span class="d-emoji">🌿</span>
+        <div class="d-name">PRADERA</div>
+        <div class="d-desc">⚙️ <strong style="color:#fff">FÁCIL</strong><br>Bioma tranquilo y verde.<br>Bloques fáciles de craftear.<br>💎 ×1 por misión</div>
+      </div>
+      <div class="diff-card" id="dcard-medium" style="background:#b8860b" onclick="selectDiffCard('medium')">
+        <span class="d-emoji">🏜️</span>
+        <div class="d-name">DESIERTO</div>
+        <div class="d-desc">⚙️ <strong style="color:#fff">MEDIO</strong><br>El sol quema fuerte.<br>¡Mobs más astutos te esperan!<br>💎 ×2 por misión</div>
+      </div>
+      <div class="diff-card" id="dcard-hard"   style="background:#c0392b" onclick="selectDiffCard('hard')">
+        <span class="d-emoji">🌋</span>
+        <div class="d-name">NETHER</div>
+        <div class="d-desc">⚙️ <strong style="color:#fff">DIFÍCIL</strong><br>Fuego y lava por todas partes.<br>¡Solo los más valientes entran!<br>💎 ×3 por misión</div>
+      </div>
+    </div>
+    <button class="screen-btn" onclick="goToSubjects()">⚔️ ¡IR A LA AVENTURA!</button>
+    <br><br>
+    <button class="screen-btn" style="background:#555;font-size:0.38rem;padding:8px 16px" onclick="goToScreen('screen-users')">◀ Volver a Selección de Héroe</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PANTALLA 3 — MATERIA
+══════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-subjects">
+  <div class="screen-panel">
+    <div class="screen-title">🗺️ ELIGE TU<br>MISIÓN</div>
+    <p class="screen-subtitle" id="subjects-subtitle">🧭 El inventario está listo, Héroe.<br>¿Qué misión vas a craftear hoy?</p>
+    <div class="subject-grid">
+      <div class="subject-card" style="background:#c0392b" onclick="goToExercises('math')">
+        <span class="s-emoji">🔢</span>
+        <div class="s-name">MISIÓN DIAMANTE<br><small style="font-size:0.45rem;opacity:.85">Matemática</small></div>
+      </div>
+      <div class="subject-card" style="background:#6c5ce7" onclick="goToExercises('lang')">
+        <span class="s-emoji">📜</span>
+        <div class="s-name">MISIÓN LIBRO<br><small style="font-size:0.45rem;opacity:.85">Lengua</small></div>
+      </div>
+      <div class="subject-card" style="background:#1a7a3a" onclick="goToExercises('eng')">
+        <span class="s-emoji">🌍</span>
+        <div class="s-name">MISIÓN MAPA<br><small style="font-size:0.45rem;opacity:.85">Inglés</small></div>
+      </div>
+      <div class="subject-card" style="background:#7c3aed" onclick="startDailyChallenge()">
+        <span class="s-emoji">⚡</span>
+        <div class="s-name">DESAFÍO DIARIO<br><small style="font-size:0.45rem;opacity:.85;color:#fde047">¡Reto Especial de Hoy!</small></div>
+      </div>
+      <div class="subject-card" style="background:#059669" onclick="goToShop()">
+        <span class="s-emoji">🛍️</span>
+        <div class="s-name">TIENDA DE SKINS<br><small style="font-size:0.45rem;opacity:.85">Avatares &amp; Ítems</small></div>
+      </div>
+      <div class="subject-card" style="background:#b8860b" onclick="goToLogros()">
+        <span class="s-emoji">🏆</span>
+        <div class="s-name">COFRE DE TROFEOS<br><small style="font-size:0.45rem;opacity:.85">Logros &amp; Ranking</small></div>
+      </div>
+      <div class="subject-card" style="background:#1a1a4a;border:4px solid #F5C518;grid-column:1/-1" onclick="goToExercises('parcial')">
+        <span class="s-emoji">📋</span>
+        <div class="s-name">⚠️ MISIÓN PARCIAL<br><small style="font-size:0.45rem;opacity:.85;color:#F5C518">Lengua, Matemática &amp; Inglés — Práctica especial</small></div>
+      </div>
+    </div>
+    <button class="screen-btn" style="background:#555;font-size:0.38rem;padding:8px 16px;margin-top:8px" onclick="goToScreen('screen-difficulty')">◀ Cambiar bioma</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     HUD FIJO (visible sólo durante el juego)
+══════════════════════════════════════════════════════ -->
+<div id="game-hud">
+  <button class="hud-back-btn" onclick="goToSubjects()">🗺️ Misiones</button>
+  <div class="hud-center">
+    <div class="hud-player" id="hud-player-name">⚔️ Héroe</div>
+    <div id="hud-subject-label" style="font-size:0.35rem;color:#ccc;margin-top:2px"></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+    <div id="hud-streak"></div>
+    <div id="hud-lives">
+      <span class="heart" id="heart-1">❤️</span>
+      <span class="heart" id="heart-2">❤️</span>
+      <span class="heart" id="heart-3">❤️</span>
+    </div>
+    <div id="hud-stars">💎 <span id="star-count">0</span></div>
+  </div>
+</div>
+
+<!-- GAME OVER OVERLAY -->
+<div id="gameover-overlay">
+  <h2>💀 SIN VIDAS 💀</h2>
+  <p id="gameover-msg">¡Los mobs te derrotaron esta vez!<br>¡Pero los héroes siempre vuelven!</p>
+  <button style="background:#c0392b" onclick="gameOverRetry()">⚔️ ¡Intentar de nuevo!</button>
+  <button style="background:#555;margin-top:4px" onclick="gameOverExit()">🗺️ Elegir otra misión</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PANTALLA 4 — EJERCICIOS
+══════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-game">
+
+<!-- MATEMÁTICA -->
+<section id="sec-math" class="section visible" style="width:100%;max-width:900px">
+  <div class="section-title">💎 MISIÓN DIAMANTE</div>
+  <div class="reading-box" style="margin-bottom:14px;font-size:0.58rem">
+    ⛏️ <strong>El Narrador habla:</strong><br>
+    "¡Héroe! Delante tuyo hay una mina llena de diamantes.<br>
+    Para craftear las herramientas más poderosas del Overworld,<br>
+    tenés que resolver los <strong>enigmas de los bloques</strong>.<br>
+    Cada respuesta correcta rompe un bloque y revela el mineral.<br>
+    ¿Estás listo para picar?"
+  </div>
+  <p class="ex-intro" style="text-align:center;margin-bottom:14px">⛏️ Elige tu desafío minero:</p>
+  <div class="subtopic-bar">
+    <button class="sub-btn" style="background:#c0392b" onclick="loadMath('read')">🔢 Leer bloques</button>
+    <button class="sub-btn" style="background:#c0392b" onclick="loadMath('valpos')">🏗️ Construir con posiciones</button>
+    <button class="sub-btn" style="background:#c0392b" onclick="loadMath('order')">🔄 Secuencia de portal</button>
+    <button class="sub-btn" style="background:#c0392b" onclick="loadMath('mental')">🧠 Cálculo de inventario</button>
+    <button class="sub-btn" style="background:#c0392b" onclick="loadMath('problem')">📜 Misiones del aldeano</button>
+    <button class="sub-btn" style="background:#8e1a0e" onclick="loadMath('multintro')">✖️ Crafteo en serie</button>
+    <button class="sub-btn" style="background:#1a3a8e" onclick="loadMath('figuras')">🔺 Figuras del bioma</button>
+    <button class="sub-btn" style="background:#1a3a8e" onclick="loadMath('cuerpos')">📦 Cuerpos del Nether</button>
+    <button class="sub-btn" style="background:#1a6e4a" onclick="loadMath('espacio')">🗺️ Mapa del Overworld</button>
+    <button class="sub-btn" style="background:#1a6e4a" onclick="loadMath('medida')">📏 Medir bloques</button>
+    <button class="sub-btn" style="background:#1a6e4a" onclick="loadMath('tiempo')">🕐 Reloj del Overworld</button>
+  </div>
+</section>
+
+<!-- LENGUA -->
+<section id="sec-lang" class="section" style="width:100%;max-width:900px">
+  <div class="section-title">📜 MISIÓN LIBRO ENCANTADO</div>
+  <div class="reading-box" style="margin-bottom:14px;font-size:0.58rem">
+    📚 <strong>El Narrador habla:</strong><br>
+    "¡Héroe! Un aldeano encontró un <strong>libro encantado</strong> escondido<br>
+    en la biblioteca del Overworld. Las páginas están llenas de<br>
+    palabras y letras mágicas. Solo vos podés descifrar el encantamiento.<br>
+    Cada letra y palabra que aprendas añade poder a tu espada.<br>
+    ¡Abrí el libro y comenzá!"
+  </div>
+  <p class="ex-intro" style="text-align:center;margin-bottom:14px">📚 Elige tu tomo encantado:</p>
+  <div class="subtopic-bar" id="lang-book-bar">
+    <button class="sub-btn lang-book-btn active-book" id="langbook-1"
+      style="background:#6c5ce7" onclick="selectLangBook(1)">📘 Tomo 1<br><small>La aldea escolar</small></button>
+    <button class="sub-btn lang-book-btn" id="langbook-2"
+      style="background:#6c5ce7" onclick="selectLangBook(2)">📗 Tomo 2<br><small>La ciudad de bloques</small></button>
+    <button class="sub-btn lang-book-btn" id="langbook-3"
+      style="background:#6c5ce7" onclick="selectLangBook(3)">📙 Tomo 3<br><small>El bosque olvidado</small></button>
+  </div>
+  <div class="subtopic-bar" id="lang-topic-bar"></div>
+</section>
+
+<!-- INGLÉS -->
+<section id="sec-eng" class="section" style="width:100%;max-width:900px">
+  <div class="section-title">🌍 MISIÓN MAPA DEL MUNDO</div>
+  <div class="reading-box" style="margin-bottom:14px;font-size:0.58rem">
+    🗺️ <strong>El Narrador habla:</strong><br>
+    "¡Héroe! El <strong>Mapa del Overworld</strong> llegó a tus manos.<br>
+    Está escrito en el idioma de las tierras lejanas: ¡<strong>inglés</strong>!<br>
+    Para viajar a nuevos biomas y comerciar con aldeanos extranjeros,<br>
+    necesitás aprender sus palabras. Cada misión te acerca más<br>
+    al <strong>portal interdimensional</strong>. ¡Vamos, aventurero!"
+  </div>
+  <p class="ex-intro" style="text-align:center;margin-bottom:14px">🌐 Elige tu misión de exploración:</p>
+  <div class="subtopic-bar">
+    <button class="sub-btn" style="background:#1a7a3a" onclick="loadEng('places')">🏙️ Lugares del bioma</button>
+    <button class="sub-btn" style="background:#1a7a3a" onclick="loadEng('prepositions')">📍 Coordenadas del mapa</button>
+    <button class="sub-btn" style="background:#1a7a3a" onclick="loadEng('isthere')">❓ ¿Hay un bloque?</button>
+    <button class="sub-btn" style="background:#1a7a3a" onclick="loadEng('sentences')">💬 Mensajes del aldeano</button>
+  </div>
+</section>
+
+<!-- CIENCIAS NATURALES -->
+<section id="sec-science" class="section" style="width:100%;max-width:900px">
+  <div class="section-title" style="color:#38bdf8;border-color:#38bdf8">🔬 LABORATORIO DE CIENCIAS</div>
+  <div class="reading-box" style="margin-bottom:14px;font-size:0.58rem;border-color:#38bdf8">
+    🧪 <strong>El Narrador habla:</strong><br>
+    "¡Héroe! La naturaleza y la ciencia guardan los misterios más fascinantes.<br>
+    Desde los seres vivos en los ecosistemas hasta los planetas del espacio.<br>
+    ¡Elegí un experimento y descubrí las leyes del universo!"
+  </div>
+  <p class="ex-intro" style="text-align:center;margin-bottom:14px;color:#38bdf8">🧪 Elige tu campo de investigación:</p>
+  <div class="subtopic-bar">
+    <button class="sub-btn" style="background:#0284c7" onclick="loadScience('ecosistemas')">🌿 Ecosistemas &amp; Seres Vivos</button>
+    <button class="sub-btn" style="background:#0284c7" onclick="loadScience('cuerpo_humano')">🫀 El Cuerpo Humano &amp; Sentidos</button>
+    <button class="sub-btn" style="background:#0284c7" onclick="loadScience('materia_energia')">💡 Materia, Energía &amp; Fuerza</button>
+    <button class="sub-btn" style="background:#0284c7" onclick="loadScience('planeta_espacio')">🪐 La Tierra &amp; El Espacio</button>
+  </div>
+</section>
+
+<!-- HISTORIA Y SOCIEDAD -->
+<section id="sec-history" class="section" style="width:100%;max-width:900px">
+  <div class="section-title" style="color:#fbbf24;border-color:#fbbf24">🏛️ TEMPLO DEL TIEMPO</div>
+  <div class="reading-box" style="margin-bottom:14px;font-size:0.58rem;border-color:#fbbf24">
+    📜 <strong>El Narrador habla:</strong><br>
+    "¡Viajero del tiempo! Abrí las puertas de los templos antiguos.<br>
+    Conocé cómo vivían las grandes civilizaciones, las normas de nuestra sociedad<br>
+    y la geografía de todo nuestro maravilloso planeta."
+  </div>
+  <p class="ex-intro" style="text-align:center;margin-bottom:14px;color:#fbbf24">🏛️ Elige tu era histórica:</p>
+  <div class="subtopic-bar">
+    <button class="sub-btn" style="background:#d97706" onclick="loadHistory('civilizaciones')">🏺 Antiguas Civilizaciones</button>
+    <button class="sub-btn" style="background:#d97706" onclick="loadHistory('sociedad_normas')">🤝 Convivencia, Normas &amp; Ciudad</button>
+    <button class="sub-btn" style="background:#d97706" onclick="loadHistory('geografia_mapas')">🗺️ Geografía, Océanos &amp; Mapas</button>
+  </div>
+</section>
+
+<!-- TIENDA DE SKINS Y AVATARES -->
+<section id="sec-shop" class="section" style="width:100%;max-width:900px">
+  <div class="section-title" style="color:#4ade80;border-color:#4ade80">🛍️ TIENDA DE SKINS VOXEL</div>
+  <div class="reading-box" style="margin-bottom:10px;font-size:0.58rem;border-color:#4ade80">
+    🪙 <strong>El Mercader del Overworld dice:</strong><br>
+    "¡Saludos, Héroe! Canjeá tus <strong style="color:#facc15">🪙 Monedas Voxel</strong> para desbloquear nuevos trajes y skins.<br>
+    <strong>¿Cómo ganar monedas?</strong> Respondé correctamente en cualquier ejercicio o misión.<br>
+    ✅ Respuesta correcta = <strong style="color:#facc15">+5 🪙 monedas</strong> &nbsp;|&nbsp; ⚡ Desafío Diario completado = <strong style="color:#facc15">+50 🪙 monedas</strong>"
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.3);padding:10px 18px;border:3px solid #000;margin-bottom:14px;">
+    <div style="font-family:'Press Start 2P', monospace;font-size:0.6rem;color:#facc15">🪙 MONEDAS: <span id="shop-coins-count">0</span></div>
+    <div style="font-family:'Press Start 2P', monospace;font-size:0.5rem;color:#4ade80">AVATAR ACTUAL: <span id="shop-current-avatar">🧒</span></div>
+  </div>
+  <div class="shop-grid" id="shop-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:14px;"></div>
+</section>
+
+<!-- PANEL DE PADRES Y PROFESORES -->
+<section id="sec-parent" class="section" style="width:100%;max-width:900px">
+  <div class="section-title" style="color:#a5b4fc;border-color:#a5b4fc">👨‍👩‍👧‍👦 PANEL PARA PADRES &amp; DOCENTES</div>
+  <div class="reading-box" style="margin-bottom:14px;font-size:0.58rem;border-color:#a5b4fc">
+    📊 <strong>Centro de Métricas de Aprendizaje:</strong><br>
+    Visualizá el rendimiento en tiempo real de los chicos: porcentaje de aciertos por materia,<br>
+    tiempo de estudio, fortalezas pedagógicas y áreas recomendadas para reforzar.
+  </div>
+  
+  <div class="dashboard-metrics" id="dashboard-metrics" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:12px;margin-bottom:18px;">
+    <!-- Métricas rápidas: Total Ejercicios, Precisión %, Racha, Monedas -->
+  </div>
+
+  <div class="card" style="background:#1e1b4b;border:3px solid #818cf8;margin-bottom:16px;">
+    <h3 style="font-family:'Press Start 2P',monospace;font-size:0.6rem;color:#818cf8;margin-bottom:12px;">📈 RENDIMIENTO POR MATERIA</h3>
+    <div id="subject-performance-bars" style="display:flex;flex-direction:column;gap:10px;"></div>
+  </div>
+
+  <div class="card" style="background:#0f172a;border:3px solid #38bdf8;">
+    <h3 style="font-family:'Press Start 2P',monospace;font-size:0.6rem;color:#38bdf8;margin-bottom:12px;">🧠 RECOMENDACIONES PEDAGÓGICAS</h3>
+    <div id="pedagogic-feedback" style="font-family:'Nunito',sans-serif;font-size:0.95rem;line-height:1.6;color:#e2e8f0;"></div>
+  </div>
+</section>
+
+<!-- LOGROS -->
+<section id="sec-logros" class="section" style="width:100%;max-width:900px">
+  <div class="section-title">🏆 COFRE DE TROFEOS</div>
+  <div class="reading-box" style="margin-bottom:14px;font-size:0.58rem">
+    🎮 <strong>El Narrador habla:</strong><br>
+    "¡Héroe! Este es tu <strong>cofre de trofeos</strong>.<br>
+    Cada misión completada desbloquea un trofeo especial.<br>
+    Son como los logros del juego: cuanto más misiones hagas,<br>
+    más poderoso te volvés. ¡Mirá todo lo que ya conseguiste!"
+  </div>
+  <div class="card" id="ach-container">
+    <p class="ex-intro" style="margin-bottom:16px">⛏️ ¡Completá misiones para abrir el cofre! 🎖️</p>
+    <div class="achievements-grid" id="ach-grid"></div>
+  </div>
+  <div class="ranking-wrap">
+    <div class="ranking-title">🏆 TABLA DE HÉROES</div>
+    <div id="ranking-container"></div>
+  </div>
+</section>
+
+<!-- PARCIAL -->
+<section id="sec-parcial" class="section" style="width:100%;max-width:900px">
+  <div class="section-title" style="color:#F5C518;border-color:#F5C518">📋 MISIÓN PARCIAL</div>
+  <div class="reading-box" style="margin-bottom:14px;font-size:0.58rem;border-color:#F5C518">
+    ⚠️ <strong>El Narrador habla:</strong><br>
+    "¡Héroe! Se acerca la <strong>Gran Batalla del Parcial</strong>.<br>
+    Los aldeanos necesitan que domines los secretos del <strong>lenguaje</strong>,<br>
+    los <strong>números</strong> y el <strong>inglés</strong> para proteger el Overworld.<br>
+    Elegí tu tema de entrenamiento y ¡prepará tu inventario!"
+  </div>
+  <p class="ex-intro" style="text-align:center;margin-bottom:10px;color:#F5C518">📚 LENGUA — Elige tu entrenamiento:</p>
+  <div class="subtopic-bar">
+    <button class="sub-btn" style="background:#4a2a8a" onclick="loadParcial('p_comprension')">📖 Lectura y comprensión</button>
+    <button class="sub-btn" style="background:#4a2a8a" onclick="loadParcial('p_escritura')">✏️ Escritura de oraciones</button>
+    <button class="sub-btn" style="background:#4a2a8a" onclick="loadParcial('p_sustantivos')">🔤 Sustantivos propios y comunes</button>
+    <button class="sub-btn" style="background:#4a2a8a" onclick="loadParcial('p_adjetivos')">🎨 Adjetivos</button>
+  </div>
+  <p class="ex-intro" style="text-align:center;margin:14px 0 10px;color:#F5C518">🔢 MATEMÁTICA — Elige tu entrenamiento:</p>
+  <div class="subtopic-bar">
+    <button class="sub-btn" style="background:#8a2a2a" onclick="loadParcial('p_numread')">🔢 Leer y escribir números</button>
+    <button class="sub-btn" style="background:#8a2a2a" onclick="loadParcial('p_orden')">🔄 Orden y secuencias</button>
+    <button class="sub-btn" style="background:#8a2a2a" onclick="loadParcial('p_mental')">🧠 Cálculo mental</button>
+    <button class="sub-btn" style="background:#8a2a2a" onclick="loadParcial('p_problema')">📝 Situaciones problemáticas</button>
+  </div>
+  <p class="ex-intro" style="text-align:center;margin:14px 0 10px;color:#4ade80">🌍 INGLÉS — Unit 5: Where do they live?</p>
+  <div class="subtopic-bar">
+    <button class="sub-btn" style="background:#1a5c2a" onclick="loadParcial('p_eng_vocab')">🐾 Animales y hábitats</button>
+    <button class="sub-btn" style="background:#1a5c2a" onclick="loadParcial('p_eng_grammar')">📝 Presente Simple (+/−)</button>
+    <button class="sub-btn" style="background:#1a5c2a" onclick="loadParcial('p_eng_doquestions')">❓ Do / Does questions</button>
+    <button class="sub-btn" style="background:#1a5c2a" onclick="loadParcial('p_eng_where')">🗺️ Where does/do + Can/Can't</button>
+    <button class="sub-btn" style="background:#1a5c2a" onclick="loadParcial('p_eng_reading')">📖 Comprensión lectora</button>
+    <button class="sub-btn" style="background:#0d4a1a;border:2px solid #4ade80" onclick="loadParcial('p_eng_match')">🐾 Match the Animal!</button>
+    <button class="sub-btn" style="background:#0d4a1a;border:2px solid #4ade80" onclick="loadParcial('p_eng_spell')">🔤 Spell the Animal!</button>
+    <button class="sub-btn" style="background:#0d4a1a;border:2px solid #4ade80" onclick="loadParcial('p_eng_spellsent')">🔡 Spell the Words!</button>
+    <button class="sub-btn" style="background:#0d3a5c;border:2px solid #60b4f5" onclick="loadParcial('p_eng_pickanimal')">🖼️ Pick the Animal!</button>
+    <button class="sub-btn" style="background:#1e3a8a;border:2px solid #38bdf8" onclick="loadParcial('p_eng_habitats')">🏞️ Match the Habitats!</button>
+    <button class="sub-btn" style="background:#701a75;border:2px solid #e879f9" onclick="loadParcial('p_eng_dodoes_photo')">❓ Do they / Does it? (Yes/No)</button>
+    <button class="sub-btn" style="background:#0e4a6a;border:2px solid #38bdf8" onclick="loadParcial('p_eng_types')">🦎 Animal Types</button>
+    <button class="sub-btn" style="background:#1a4a1a;border:2px solid #86efac" onclick="loadParcial('p_eng_truefalse')">✅ True or False</button>
+    <button class="sub-btn" style="background:#4a1a4a;border:2px solid #c084fc" onclick="loadParcial('p_eng_writesent')">✏️ Complete the Sentence</button>
+    <button class="sub-btn" style="background:#4a2a0a;border:2px solid #fbbf24" onclick="loadParcial('p_eng_describe')">🔍 Describe the Animal</button>
+    <button class="sub-btn" style="background:#7c2d12;border:2px solid #fb923c" onclick="loadParcial('p_eng_bodyparts')">🦴 Match Body Parts!</button>
+  </div>
+</section>
+
+</div><!-- /screen-game -->
+
+<!-- ══════════════════════════════════════════════════════
+     PANTALLA 5 — EJERCICIO ACTIVO
+══════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-exercise">
+  <div class="ex-title-bar">
+    <button class="ex-back-btn" onclick="backToTopics()">◀ Temas</button>
+    <div class="ex-topic-name" id="ex-topic-name">Ejercicio</div>
+  </div>
+  <div class="card" id="ex-card-math" style="display:none">
+    <div class="progress-wrap"><div class="progress-bar" id="math-progress" style="width:0%"></div></div>
+    <div class="exercise" id="math-exercise"><p class="ex-intro" style="margin-top:16px">Cargando...</p></div>
+  </div>
+  <div class="card" id="ex-card-lang" style="display:none">
+    <div class="progress-wrap"><div class="progress-bar" id="lang-progress" style="width:0%"></div></div>
+    <div class="exercise" id="lang-exercise"><p class="ex-intro" style="margin-top:16px">Cargando...</p></div>
+  </div>
+  <div class="card" id="ex-card-eng" style="display:none">
+    <div class="progress-wrap"><div class="progress-bar" id="eng-progress" style="width:0%"></div></div>
+    <div class="exercise" id="eng-exercise"><p class="ex-intro" style="margin-top:16px">Cargando...</p></div>
+  </div>
+  <div class="card" id="ex-card-parcial" style="display:none;border:3px solid #F5C518">
+    <div class="progress-wrap"><div class="progress-bar" id="parcial-progress" style="width:0%;background:#F5C518"></div></div>
+    <div class="exercise" id="parcial-exercise"><p class="ex-intro" style="margin-top:16px">Cargando...</p></div>
+  </div>
+  <div class="card" id="ex-card-science" style="display:none;border:3px solid #38bdf8">
+    <div class="progress-wrap"><div class="progress-bar" id="science-progress" style="width:0%;background:#38bdf8"></div></div>
+    <div class="exercise" id="science-exercise"><p class="ex-intro" style="margin-top:16px">Cargando...</p></div>
+  </div>
+  <div class="card" id="ex-card-history" style="display:none;border:3px solid #fbbf24">
+    <div class="progress-wrap"><div class="progress-bar" id="history-progress" style="width:0%;background:#fbbf24"></div></div>
+    <div class="exercise" id="history-exercise"><p class="ex-intro" style="margin-top:16px">Cargando...</p></div>
+  </div>
+  <div class="card" id="ex-card-daily" style="display:none;border:3px solid #c084fc">
+    <div class="progress-wrap"><div class="progress-bar" id="daily-progress" style="width:0%;background:#c084fc"></div></div>
+    <div class="exercise" id="daily-exercise"><p class="ex-intro" style="margin-top:16px">Cargando...</p></div>
+  </div>
+</div><!-- /screen-exercise -->
+
+<!-- TOAST LOGRO -->
+<div id="ach-toast">🏆 ¡Nuevo trofeo desbloqueado!</div>
+
+<!-- PIN LOGIN MODAL -->
+<div id="pin-modal" style="display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; flex-direction: column;">
+  <div class="screen-panel" style="max-width: 420px; width: 90%; background: #2563eb; border: 4px solid #000; box-shadow: 6px 6px 0 #000; padding: 24px; text-align: center; color: white;">
+    <div class="screen-title" id="pin-modal-title" style="font-size: 1.1rem; color: var(--mc-gold); line-height: 1.4; margin-bottom: 12px;">⚔️ INICIAR SESIÓN</div>
+    <p id="pin-modal-subtitle" style="font-family: 'Nunito', sans-serif; font-size: 1.0rem; color: #fff; margin-bottom: 16px;">Ingresá tu PIN secreto para entrar al Overworld:</p>
+    
+    <!-- Display de PIN Dots — se renderizan dinámicamente -->
+    <div id="pin-dots-container" style="display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; min-height: 30px; align-items: center;"></div>
+    
+    <input type="password" id="hidden-pin-input" maxlength="6" style="opacity: 0; position: absolute; pointer-events: none;" readonly />
+    
+    <!-- Custom Keypad -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 280px; margin: 0 auto 16px;">
+      <button class="opt-btn" onclick="typePin('1')" style="padding: 10px; font-family: 'Press Start 2P', monospace; font-size: 0.8rem; background: #3b82f6; color: white;">1</button>
+      <button class="opt-btn" onclick="typePin('2')" style="padding: 10px; font-family: 'Press Start 2P', monospace; font-size: 0.8rem; background: #3b82f6; color: white;">2</button>
+      <button class="opt-btn" onclick="typePin('3')" style="padding: 10px; font-family: 'Press Start 2P', monospace; font-size: 0.8rem; background: #3b82f6; color: white;">3</button>
+      <button class="opt-btn" onclick="typePin('4')" style="padding: 10px; font-family: 'Press Start 2P', monospace; font-size: 0.8rem; background: #3b82f6; color: white;">4</button>
+      <button class="opt-btn" onclick="typePin('5')" style="padding: 10px; font-family: 'Press Start 2P', monospace; font-size: 0.8rem; background: #3b82f6; color: white;">5</button>
+      <button class="opt-btn" onclick="typePin('6')" style="padding: 10px; font-family: 'Press Start 2P', monospace; font-size: 0.8rem; background: #3b82f6; color: white;">6</button>
+      <button class="opt-btn" onclick="typePin('7')" style="padding: 10px; font-family: 'Press Start 2P', monospace; font-size: 0.8rem; background: #3b82f6; color: white;">7</button>
+      <button class="opt-btn" onclick="typePin('8')" style="padding: 10px; font-family: 'Press Start 2P', monospace; font-size: 0.8rem; background: #3b82f6; color: white;">8</button>
+      <button class="opt-btn" onclick="typePin('9')" style="padding: 10px; font-family: 'Press Start 2P', monospace; font-size: 0.8rem; background: #3b82f6; color: white;">9</button>
+      <button class="opt-btn" onclick="typePin('clear')" style="padding: 10px; font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 800; background: #c0392b; color: white;">BORRAR</button>
+      <button class="opt-btn" onclick="typePin('0')" style="padding: 10px; font-family: 'Press Start 2P', monospace; font-size: 0.8rem; background: #3b82f6; color: white;">0</button>
+      <button class="opt-btn" onclick="submitPinLogin()" style="padding: 10px; font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 800; background: #16a34a; color: white;">ENTRAR</button>
+    </div>
+    
+    <p id="pin-login-error" style="font-family: 'Nunito', sans-serif; font-size: 0.95rem; color: #fee2e2; background: rgba(239, 68, 68, 0.3); border: 2px solid #ef4444; padding: 6px 12px; display: none; font-weight: bold; margin-bottom: 12px;"></p>
+    
+    <button class="screen-btn" onclick="closePinModal()" style="background: #555; font-size: 0.35rem; padding: 8px 16px;">CANCELAR</button>
+  </div>
+</div>
+
+<!-- REWARD MODAL -->
+<div id="reward-modal">
+  <div class="reward-box">
+    <div class="big-emoji" id="reward-emoji">🏆</div>
+    <h2 id="reward-title">¡Misión cumplida!</h2>
+    <p id="reward-msg">¡Completaste el desafío!</p>
+    <div class="reward-actions">
+      <button class="reward-close-btn reward-btn-replay"   onclick="rewardReplay()">⚔️ Nueva misión</button>
+      <button class="reward-close-btn reward-btn-topics"   onclick="rewardGoTopics()">🗺️ Elegir desafío</button>
+      <button class="reward-close-btn reward-btn-subjects" onclick="rewardGoSubjects()">🧭 Otros biomas</button>
+    </div>
+  </div>
+</div>
+
+  <!-- Scripts modulares -->
+  <script src="/js/exercises.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

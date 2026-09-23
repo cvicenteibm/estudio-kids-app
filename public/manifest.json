@@ -1,0 +1,24 @@
+{
+  "name": "Héroe del Overworld - Estudio Kids",
+  "short_name": "EstudioKids",
+  "description": "Aventura de aprendizaje gamificada para niños en primaria",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121820",
+  "theme_color": "#5D9E3A",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
